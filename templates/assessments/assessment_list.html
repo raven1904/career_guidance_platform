@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessments - CareerGuide Pro{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Career Assessments</h2>
+            <p class="text-muted">Discover your strengths and find your perfect career path</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">🧠 Personality Assessment</h5>
+                </div>
+                <div class="card-body">
+                    <p>Discover your personality type and suitable career paths based on MBTI principles.</p>
+                    <ul class="list-unstyled">
+                        <li>✅ 20 questions</li>
+                        <li>⏱️ 15 minutes</li>
+                        <li>🎯 Career matches</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'take_assessment' 1 %}" class="btn btn-primary w-100">Start Assessment</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">💼 Skills Assessment</h5>
+                </div>
+                <div class="card-body">
+                    <p>Evaluate your current skills and identify areas for development.</p>
+                    <ul class="list-unstyled">
+                        <li>✅ 25 questions</li>
+                        <li>⏱️ 20 minutes</li>
+                        <li>📊 Skill analysis</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="#" class="btn btn-success w-100">Coming Soon</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">❤️ Interests Assessment</h5>
+                </div>
+                <div class="card-body">
+                    <p>Match your interests with potential careers and industries.</p>
+                    <ul class="list-unstyled">
+                        <li>✅ 15 questions</li>
+                        <li>⏱️ 10 minutes</li>
+                        <li>🏢 Industry matches</li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="#" class="btn btn-info w-100">Coming Soon</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

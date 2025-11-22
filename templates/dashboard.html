@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - CareerGuide Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Welcome Section -->
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="fw-bold">Welcome back, {{ user.username }}! 👋</h2>
+      <p class="text-muted">Here's your career development overview</p>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="widget text-center">
+        <h4 class="text-primary">📊</h4>
+        <h5>Assessments Completed</h5>
+        <h3 class="fw-bold text-primary">2/3</h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="widget text-center">
+        <h4 class="text-success">🎯</h4>
+        <h5>Career Matches</h5>
+        <h3 class="fw-bold text-success">15</h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="widget text-center">
+        <h4 class="text-warning">📚</h4>
+        <h5>Learning Paths</h5>
+        <h3 class="fw-bold text-warning">3</h3>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="widget text-center">
+        <h4 class="text-info">💼</h4>
+        <h5>Job Applications</h5>
+        <h3 class="fw-bold text-info">5</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Grid -->
+  <div class="dashboard-grid">
+    <!-- Personality Profile -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">🧠 Personality Profile</h5>
+      </div>
+      <div class="card-body">
+        {% if user.assessmentresult_set.exists %}
+        {% with latest_result=user.assessmentresult_set.first %}
+        <div class="text-center mb-3">
+          <span class="personality-badge">
+            {{ latest_result.personality_type }}
+          </span>
+        </div>
+        <p class="text-muted small">
+          Based on your latest assessment completed on
+          {{ latest_result.completed_at|date:"M d, Y" }}
+        </p>
+        {% endwith %}
+        {% else %}
+        <p class="text-muted">Complete your first assessment to see your personality profile</p>
+        <a href="{% url 'assessment_list' %}" class="btn btn-primary btn-sm">
+          Take Assessment
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Recommended Careers -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">🎯 Recommended Careers</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            Data Scientist
+            <span class="badge bg-primary">95% Match</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            UX Designer
+            <span class="badge bg-primary">88% Match</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between align-items-center">
+            Product Manager
+            <span class="badge bg-primary">82% Match</span>
+          </div>
+        </div>
+        <a href="#" class="btn btn-accent btn-sm mt-3 w-100">View All Recommendations</a>
+      </div>
+    </div>
+
+    <!-- Learning Progress -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">📚 Learning Paths</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <h6>Data Science Fundamentals</h6>
+          <div class="progress mb-2">
+            <div class="progress-bar" style="width: 65%"></div>
+          </div>
+          <small class="text-muted">65% Complete</small>
+        </div>
+        <div class="mb-3">
+          <h6>Machine Learning</h6>
+          <div class="progress mb-2">
+            <div class="progress-bar" style="width: 30%"></div>
+          </div>
+          <small class="text-muted">30% Complete</small>
+        </div>
+        <a href="#" class="btn btn-primary btn-sm w-100">Continue Learning</a>
+      </div>
+    </div>
+
+    <!-- Upcoming Tasks -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">📅 Upcoming Tasks</h5>
+      </div>
+      <div class="card-body">
+        <div class="list-group list-group-flush">
+          <div class="list-group-item">
+            <small class="text-muted">Today</small>
+            <p class="mb-1">Complete Skills Assessment</p>
+          </div>
+          <div class="list-group-item">
+            <small class="text-muted">Tomorrow</small>
+            <p class="mb-1">Review Career Matches</p>
+          </div>
+          <div class="list-group-item">
+            <small class="text-muted">This Week</small>
+            <p class="mb-1">Start Python Course</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Market Insights -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">💼 Job Market Insights</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <strong>Hot Job Alert:</strong> Data Scientist roles have grown by 25% in your area
+        </div>
+        <p class="small text-muted">
+          Average salary: $120,000<br>
+          Top companies hiring: Google, Amazon, Microsoft
+        </p>
+        <a href="#" class="btn btn-accent btn-sm w-100">Explore Jobs</a>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0">⚡ Quick Actions</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="{% url 'assessment_list' %}" class="btn btn-outline-primary">
+            Take New Assessment
+          </a>
+          <a href="#" class="btn btn-outline-primary">
+            Update Profile
+          </a>
+          <a href="#" class="btn btn-outline-primary">
+            Browse Courses
+          </a>
+          <a href="#" class="btn btn-outline-primary">
+            Career Counseling
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
