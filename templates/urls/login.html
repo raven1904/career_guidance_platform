@@ -1,26 +1,249 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
 
 {% block title %}Login - CareerGuide Pro{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-0">Sign In</h4>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    {{ form|crispy }}
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
-                </form>
-                <div class="text-center mt-3">
-                    <p>Don't have an account? <a href="{% url 'register' %}">Register here</a></p>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<style>
+    /* --- PALETTE VARIABLES --- */
+    :root {
+        --wisteria: #809BCE;
+        --powder: #95B8D1;
+        --pearl: #B8E0D2;
+        --honeydew: #D6EADF;
+        --petal: #EAC4D5;
+        --dark: #2c3e50;
+        --muted: #64748b;
+        --bg-light: #f8f9fa;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg-light);
+    }
+
+    /* --- LAYOUT WRAPPER --- */
+    .login-wrapper {
+        position: relative;
+        min-height: 85vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        /* Soft gradient background */
+        background: linear-gradient(135deg, #f6f8fd 0%, #eef2f6 100%);
+    }
+
+    /* --- ANIMATED BLOBS --- */
+    .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.5;
+        z-index: 0;
+        animation: float 8s infinite ease-in-out;
+    }
+
+    .blob-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--wisteria);
+        top: -100px;
+        left: -100px;
+    }
+
+    .blob-2 {
+        width: 350px;
+        height: 350px;
+        background: var(--petal);
+        bottom: -50px;
+        right: -50px;
+        animation-delay: 2s;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translate(0, 0);
+        }
+
+        50% {
+            transform: translate(20px, -20px);
+        }
+    }
+
+    /* --- GLASS LOGIN CARD --- */
+    .login-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        border-radius: 30px;
+        padding: 40px;
+        box-shadow: 0 20px 60px rgba(128, 155, 206, 0.15);
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--wisteria), var(--powder));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 20px rgba(128, 155, 206, 0.3);
+    }
+
+    /* --- FORM STYLING OVERRIDES --- */
+    /* These styles override standard Bootstrap/Crispy styling to match the theme */
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label,
+    label {
+        font-weight: 600;
+        color: var(--dark);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
+
+    .text-muted {
+        font-size: 0.85rem;
+    }
+
+    /* Pill-shaped inputs */
+    .form-control {
+        border-radius: 50px;
+        padding: 12px 20px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 0.95rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 4px rgba(149, 184, 209, 0.2);
+        border-color: var(--powder);
+    }
+
+    /* --- LOGIN BUTTON --- */
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        border-radius: 50px;
+        background: linear-gradient(135deg, var(--wisteria), var(--powder));
+        border: none;
+        color: white;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-top: 10px;
+        transition: all 0.3s;
+        box-shadow: 0 10px 20px rgba(128, 155, 206, 0.3);
+    }
+
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 25px rgba(128, 155, 206, 0.4);
+        background: linear-gradient(135deg, #6b86b8, #82a7bf);
+        color: white;
+    }
+
+    .divider {
+        height: 1px;
+        background: rgba(0, 0, 0, 0.1);
+        margin: 30px 0;
+        position: relative;
+    }
+
+    .divider span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fcfdfe;
+        /* Matches perceived bg */
+        padding: 0 10px;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .register-link {
+        color: var(--wisteria);
+        font-weight: 600;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .register-link:hover {
+        color: var(--dark);
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="container d-flex justify-content-center align-items-center">
+
+        <div class="login-card" data-aos="zoom-in" data-aos-duration="800">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="bi bi-person-fill-lock"></i>
                 </div>
+                <h3 class="fw-bold text-dark">Welcome Back</h3>
+                <p class="text-muted">Please sign in to access your dashboard</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    {{ form|crispy }}
+                </div>
+
+                <button type="submit" class="btn-login">
+                    Sign In <i class="bi bi-arrow-right-short ms-1"></i>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <div class="text-center">
+                <p class="mb-0 text-muted">Don't have an account yet?</p>
+                <a href="{% url 'register' %}" class="register-link">Create an Account</a>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init();
+</script>
 {% endblock %}

@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Career Recommendations - CareerGuide Pro{% endblock %}
+
+{% block content %}
+<div class="container-fluid dashboard-container">
+
+  <div class="row mb-5 align-items-center header-section">
+    <div class="col-md-8">
+      <h2 class="fw-bold text-dark">Your Career Path</h2>
+      <p class="text-secondary mb-0">AI-powered recommendations based on your unique profile.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+      <a href="{% url 'recommendation_dashboard' %}?refresh=true" class="btn btn-outline-primary btn-refresh">
+        <i class="bi bi-arrow-clockwise"></i> Refresh Analysis
+      </a>
+    </div>
+  </div>
+
+  <div class="row mb-3">
+    <div class="col-12">
+      <h4 class="section-title"><span class="highlight-bar"></span> Top Matches</h4>
+    </div>
+  </div>
+
+  <div class="row">
+    {% for recommendation in recommendations|slice:":3" %}
+    <div class="col-lg-4 col-md-6 mb-4">
+      <div class="card h-100 recommendation-card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-start">
+          <div>
+            <span class="badge bg-light text-primary mb-2">{{ recommendation.category|default:"General" }}</span>
+            <h5 class="card-title fw-bold text-dark mb-0">{{ recommendation.career_title }}</h5>
+          </div>
+          <button class="btn btn-link p-0 text-decoration-none star-btn"
+            onclick="toggleFavorite('{{ recommendation.id }}', this)"
+            <span class="star-icon">{% if recommendation.is_favorite %}⭐{% else %}☆{% endif %}</span>
+          </button>
+        </div>
+
+        <div class="card-body">
+          <div class="d-flex align-items-center justify-content-center py-4">
+            <div class="match-ring" style="--percent: {{ recommendation.match_score }}">
+              <div class="match-content">
+                <span class="h3 fw-bold mb-0">{{ recommendation.match_score }}%</span>
+                <span class="small text-muted">Match</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="row text-center g-2 mb-4 stats-grid">
+            <div class="col-4">
+              <div class="p-2 bg-light rounded">
+                <small class="d-block text-muted text-uppercase" style="font-size: 0.65rem;">Salary</small>
+                <span class="fw-bold text-dark">${{ recommendation.salary_range.max|default:"--" }}k</span>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 bg-light rounded">
+                <small class="d-block text-muted text-uppercase" style="font-size: 0.65rem;">Growth</small>
+                <span class="fw-bold text-success">+{{ recommendation.job_growth|default:"--" }}%</span>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-2 bg-light rounded">
+                <small class="d-block text-muted text-uppercase" style="font-size: 0.65rem;">Remote</small>
+                <span class="fw-bold text-dark">
+                  {% if recommendation.remote_friendly %}Yes{% else %}No{% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <small class="text-muted fw-bold mb-2 d-block">Compatibility Breakdown</small>
+            {% with scores=recommendation.detailed_scores %}
+            <div class="progress-stacked" style="height: 8px; border-radius: 4px;">
+              <div class="progress" role="progressbar" style="width: 25%" aria-label="Personality">
+                <div class="progress-bar bg-purple" style="width: {{ scores.personality }}%"></div>
+              </div>
+              <div class="progress" role="progressbar" style="width: 25%" aria-label="Skills">
+                <div class="progress-bar bg-teal" style="width: {{ scores.skills }}%"></div>
+              </div>
+              <div class="progress" role="progressbar" style="width: 25%" aria-label="Education">
+                <div class="progress-bar bg-blue" style="width: {{ scores.education }}%"></div>
+              </div>
+              <div class="progress" role="progressbar" style="width: 25%" aria-label="Market">
+                <div class="progress-bar bg-orange" style="width: {{ scores.market }}%"></div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between mt-1 text-muted" style="font-size: 0.7rem;">
+              <span>Pers.</span>
+              <span>Skill</span>
+              <span>Edu.</span>
+              <span>Mkt.</span>
+            </div>
+            {% endwith %}
+          </div>
+        </div>
+
+        <div class="card-footer bg-white border-0 pb-4 pt-0">
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-dark btn-sm" data-bs-toggle="modal" data-bs-target="#careerModal"
+              data-title="{{ recommendation.career_title }}"
+              data-description="{{ recommendation.description|default:'Detailed career analysis is currently being updated for this role.' }}"
+              data-salary-min="{{ recommendation.salary_range.min }}"
+              data-salary-max="{{ recommendation.salary_range.max }}" onclick="populateModal(this)">
+              View Career Details
+            </button>
+            <a href="{% url 'skill_gap_analysis' %}?career={{ recommendation.career_title|urlencode }}"
+              class="btn btn-primary btn-sm">
+              Analyze Skill Gap
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="alert alert-light border shadow-sm text-center py-5">
+        <h4 class="alert-heading mb-3">Waiting for Data</h4>
+        <p class="mb-4">Complete your profile assessments to unlock personalized recommendations.</p>
+        <a href="{% url 'assessment_list' %}" class="btn btn-primary px-4">Start Assessment</a>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="row mt-5 mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom py-3">
+          <h5 class="mb-0 fw-bold">Full Recommendation List</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="ps-4 py-3">Career Title</th>
+                  <th class="py-3">Match</th>
+                  <th class="py-3">Demand</th>
+                  <th class="py-3">Salary Range</th>
+                  <th class="text-end pe-4 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for recommendation in recommendations %}
+                <tr>
+                  <td class="ps-4">
+                    <div class="fw-bold">{{ recommendation.career_title }}</div>
+                    <small class="text-muted">{{ recommendation.category|default:"General" }}</small>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <span
+                        class="me-2 fw-bold {% if recommendation.match_score > 80 %}text-success{% elif recommendation.match_score > 60 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ recommendation.match_score }}%
+                      </span>
+                      <div class="progress flex-grow-1" style="height: 4px; width: 60px;">
+                        <div
+                          class="progress-bar {% if recommendation.match_score > 80 %}bg-success{% elif recommendation.match_score > 60 %}bg-warning{% else %}bg-danger{% endif %}"
+                          role="progressbar" style="width: {{ recommendation.match_score }}%"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill bg-light text-dark border">
+                      {{ recommendation.demand_score|default:"Normal" }}/100
+                    </span>
+                  </td>
+                  <td>
+                    ${{ recommendation.salary_range.min }}k - ${{ recommendation.salary_range.max }}k
+                  </td>
+                  <td class="text-end pe-4">
+                    <a href="{% url 'skill_gap_analysis' %}?career={{ recommendation.career_title|urlencode }}"
+                      class="btn btn-sm btn-link text-decoration-none">Skills</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="careerModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="modalCareerTitle">Career Title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalCareerDescription" class="text-muted mb-4">Description goes here...</p>
+
+        <div class="alert alert-light border">
+          <div class="d-flex justify-content-between">
+            <span><strong>Estimated Salary:</strong></span>
+            <span class="text-success fw-bold" id="modalSalary"></span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <a href="#" id="modalActionBtn" class="btn btn-primary">View Full Roadmap</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --primary-color: #2563EB;
+    --secondary-color: #64748B;
+    --success-color: #10B981;
+    --bg-light: #F8FAFC;
+    /* Custom Progress Colors */
+    --prog-purple: #8B5CF6;
+    --prog-teal: #14B8A6;
+    --prog-blue: #3B82F6;
+    --prog-orange: #F59E0B;
+  }
+
+  .dashboard-container {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    padding-top: 2rem;
+  }
+
+  .section-title {
+    color: #1E293B;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .highlight-bar {
+    display: inline-block;
+    width: 6px;
+    height: 24px;
+    background-color: var(--primary-color);
+    margin-right: 10px;
+    border-radius: 4px;
+  }
+
+  .recommendation-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 12px;
+  }
+
+  .recommendation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* CSS Radial Progress Ring */
+  .match-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, white 79%, transparent 80% 100%),
+      conic-gradient(var(--primary-color) calc(var(--percent) * 1%), #E2E8F0 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .match-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+  }
+
+  /* Custom Progress Bar Colors */
+  .bg-purple {
+    background-color: var(--prog-purple);
+  }
+
+  .bg-teal {
+    background-color: var(--prog-teal);
+  }
+
+  .bg-blue {
+    background-color: var(--prog-blue);
+  }
+
+  .bg-orange {
+    background-color: var(--prog-orange);
+  }
+
+  .star-btn {
+    font-size: 1.25rem;
+    line-height: 1;
+    color: #CBD5E1;
+  }
+
+  .star-btn:hover {
+    color: #F59E0B;
+  }
+
+  .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+  }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // 1. Dynamic Modal Population
+  function populateModal(button) {
+    const title = button.getAttribute('data-title');
+    const desc = button.getAttribute('data-description');
+    const min = button.getAttribute('data-salary-min');
+    const max = button.getAttribute('data-salary-max');
+
+    document.getElementById('modalCareerTitle').textContent = title;
+    document.getElementById('modalCareerDescription').textContent = desc;
+
+    let salaryText = "Not available";
+    if (min && max) {
+      salaryText = `$${min}k - $${max}k / year`;
+    }
+    document.getElementById('modalSalary').textContent = salaryText;
+
+    // Update the action button URL dynamically
+    const roadmapUrl = `{% url 'skill_gap_analysis' %}?career=${encodeURIComponent(title)}`;
+    document.getElementById('modalActionBtn').setAttribute('href', roadmapUrl);
+  }
+
+  // 2. Favorite Toggle with Syntax Fix
+  function toggleFavorite(recommendationId, btnElement) {
+    fetch(`/recommendations/toggle-favorite/${recommendationId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json',
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Toggle UI immediately without reload for better UX
+          const starSpan = btnElement.querySelector('.star-icon');
+          if (starSpan.textContent === '⭐') {
+            starSpan.textContent = '☆';
+          } else {
+            starSpan.textContent = '⭐';
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        // FIXED SYNTAX ERROR: Added backticks for template literal
+        window.location.href = `/recommendations/toggle-favorite/${recommendationId}/`;
+      });
+  }
+
+  // Helper for Cookies
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+{% endblock %}

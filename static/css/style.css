@@ -1,5 +1,5 @@
-/* CareerGuide Pro - Premium SaaS Design */
 :root {
+    /* Color Palette */
     --background: #F1F7EE;
     --primary: #B0BEA9;
     --secondary: #92AA83;
@@ -8,20 +8,31 @@
     --text-dark: #2C3E50;
     --text-light: #7F8C8D;
     --white: #FFFFFF;
+
+    /* Gradients */
     --gradient-primary: linear-gradient(135deg, #92AA83 0%, #B0BEA9 100%);
     --gradient-accent: linear-gradient(135deg, #E0EDC5 0%, #E7F59E 100%);
     --gradient-premium: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* Shadows */
     --shadow-soft: 0 8px 32px rgba(146, 170, 131, 0.1);
     --shadow-medium: 0 15px 35px rgba(146, 170, 131, 0.15);
     --shadow-large: 0 25px 50px rgba(146, 170, 131, 0.2);
+
+    /* Border Radius */
     --border-radius: 16px;
     --border-radius-lg: 24px;
 }
 
+/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
@@ -30,11 +41,9 @@ body {
     color: var(--text-dark);
     line-height: 1.7;
     overflow-x: hidden;
-}
-
-/* Smooth Scrolling */
-html {
-    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    /* Smoother font rendering */
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Premium Navigation */
@@ -97,10 +106,11 @@ html {
     width: 80%;
 }
 
-/* Main Content with Padding for Fixed Nav */
+/* Main Content Layout */
 .main-container {
     min-height: 100vh;
     padding-top: 80px;
+    /* Account for fixed navbar */
 }
 
 /* Premium Hero Section */
@@ -114,10 +124,8 @@ html {
 .hero-section::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
+    /* Replaces top/left/right/bottom: 0 */
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%23F1F7EE" fill-opacity="0.1" points="0,1000 1000,0 1000,1000"/></svg>');
     background-size: cover;
 }
@@ -143,8 +151,8 @@ html {
     color: var(--text-light);
     margin-bottom: 2.5rem;
     max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
+    /* Replaces margin-left/right: auto */
 }
 
 /* Premium Card Design */
@@ -156,6 +164,8 @@ html {
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     position: relative;
+    will-change: transform, box-shadow;
+    /* Performance optimization */
 }
 
 .card::before {
@@ -168,6 +178,8 @@ html {
     background: var(--gradient-primary);
     transform: scaleX(0);
     transition: transform 0.3s ease;
+    transform-origin: left;
+    /* Defines animation start point */
 }
 
 .card:hover::before {
@@ -198,6 +210,7 @@ html {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .btn::before {
@@ -207,7 +220,7 @@ html {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: left 0.5s;
 }
 
@@ -245,16 +258,19 @@ html {
     transition: all 0.3s ease;
     background: rgba(255, 255, 255, 0.8);
     font-size: 0.95rem;
+    width: 100%;
 }
 
 .form-control:focus {
+    outline: none;
+    /* Remove default outline */
     border-color: var(--secondary);
     box-shadow: 0 0 0 0.2rem rgba(146, 170, 131, 0.15);
     background: var(--white);
     transform: translateY(-2px);
 }
 
-/* Dashboard Grid with Animation */
+/* Dashboard Grid & Widgets */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -289,9 +305,10 @@ html {
     background: var(--gradient-primary);
     border-radius: 10px;
     transition: width 1s ease-in-out;
+    height: 100%;
 }
 
-/* Personality Badge Premium */
+/* Premium Elements */
 .personality-badge {
     background: var(--gradient-premium);
     color: var(--white);
@@ -305,12 +322,19 @@ html {
 }
 
 @keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
-/* Feature Icons */
 .feature-icon {
     width: 80px;
     height: 80px;
@@ -341,10 +365,7 @@ html {
 .stats-section::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><circle fill="rgba(255,255,255,0.1)" cx="200" cy="200" r="100"/><circle fill="rgba(255,255,255,0.05)" cx="800" cy="800" r="150"/></svg>');
 }
 
@@ -355,7 +376,7 @@ html {
     display: block;
 }
 
-/* Loading Animation */
+/* Animations */
 .loading-spinner {
     width: 40px;
     height: 40px;
@@ -367,21 +388,32 @@ html {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
-/* Floating Elements */
 .floating {
     animation: float 6s ease-in-out infinite;
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
 }
 
-/* Assessment Questions */
+/* Assessment Components */
 .assessment-question {
     background: var(--white);
     padding: 2.5rem;
@@ -406,6 +438,8 @@ html {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
+    width: 100%;
+    text-align: left;
 }
 
 .choice-option:hover {
@@ -421,13 +455,14 @@ html {
     transform: translateX(10px);
 }
 
-/* Alert Premium */
+/* Alerts */
 .alert {
     border: none;
     border-radius: var(--border-radius);
     padding: 1.2rem 1.5rem;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    margin-bottom: 1rem;
 }
 
 .alert-success {
@@ -442,28 +477,7 @@ html {
     border-left: 4px solid var(--highlight);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-    
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-    
-    .navbar {
-        padding: 1rem;
-    }
-    
-    .main-container {
-        padding: 1rem;
-        padding-top: 100px;
-    }
-}
-
-/* Scroll Animations */
+/* Animations & Scroll */
 .fade-in {
     opacity: 0;
     transform: translateY(30px);
@@ -473,6 +487,35 @@ html {
 .fade-in.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+    }
+
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    .main-container {
+        padding: 1rem;
+        padding-top: 100px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-section {
+        padding: 6rem 0 4rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 }
 
 /* Custom Scrollbar */

@@ -1,188 +1,607 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Dashboard - CareerGuide Pro{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-  <!-- Welcome Section -->
-  <div class="row mb-4">
-    <div class="col">
-      <h2 class="fw-bold">Welcome back, {{ user.username }}! 👋</h2>
-      <p class="text-muted">Here's your career development overview</p>
-    </div>
-  </div>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
+  rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
-  <!-- Quick Stats -->
-  <div class="row mb-4">
-    <div class="col-md-3">
-      <div class="widget text-center">
-        <h4 class="text-primary">📊</h4>
-        <h5>Assessments Completed</h5>
-        <h3 class="fw-bold text-primary">2/3</h3>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="widget text-center">
-        <h4 class="text-success">🎯</h4>
-        <h5>Career Matches</h5>
-        <h3 class="fw-bold text-success">15</h3>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="widget text-center">
-        <h4 class="text-warning">📚</h4>
-        <h5>Learning Paths</h5>
-        <h3 class="fw-bold text-warning">3</h3>
-      </div>
-    </div>
-    <div class="col-md-3">
-      <div class="widget text-center">
-        <h4 class="text-info">💼</h4>
-        <h5>Job Applications</h5>
-        <h3 class="fw-bold text-info">5</h3>
-      </div>
-    </div>
-  </div>
+<style>
+  /* --- PALETTE VARIABLES --- */
+  :root {
+    --wisteria: #809BCE;
+    --powder: #95B8D1;
+    --pearl: #B8E0D2;
+    --honeydew: #D6EADF;
+    --petal: #EAC4D5;
+    --dark: #2c3e50;
+    --muted: #64748b;
+    --bg-light: #f8f9fa;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  }
 
-  <!-- Main Dashboard Grid -->
-  <div class="dashboard-grid">
-    <!-- Personality Profile -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">🧠 Personality Profile</h5>
-      </div>
-      <div class="card-body">
-        {% if user.assessmentresult_set.exists %}
-        {% with latest_result=user.assessmentresult_set.first %}
-        <div class="text-center mb-3">
-          <span class="personality-badge">
-            {{ latest_result.personality_type }}
-          </span>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    color: var(--dark);
+  }
+
+  /* --- DASHBOARD HEADER --- */
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--wisteria) 0%, var(--powder) 100%);
+    padding: 100px 0 60px 0;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    color: white;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(50px);
+    opacity: 0.4;
+  }
+
+  .hb-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--petal);
+    top: -50px;
+    right: -50px;
+  }
+
+  .hb-2 {
+    width: 200px;
+    height: 200px;
+    background: var(--pearl);
+    bottom: -50px;
+    left: -50px;
+  }
+
+  .welcome-text h2 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .welcome-text p {
+    opacity: 0.9;
+    font-weight: 300;
+    font-size: 1.1rem;
+  }
+
+  /* --- GRADIENT CARD STYLES --- */
+  /* Base Card */
+  .glass-card {
+    border-radius: 25px;
+    border: 1px solid rgba(0, 0, 0, 0.03);
+    box-shadow: var(--card-shadow);
+    padding: 30px;
+    height: 100%;
+    transition: all 0.3s ease;
+    background: white;
+    /* Fallback */
+  }
+
+  .glass-card:hover,
+  .widget-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(128, 155, 206, 0.15);
+  }
+
+  /* Specific Gradient Mixins */
+  .grad-wisteria {
+    background: linear-gradient(145deg, #fff 50%, rgba(128, 155, 206, 0.15) 100%);
+  }
+
+  .grad-powder {
+    background: linear-gradient(145deg, #fff 50%, rgba(149, 184, 209, 0.2) 100%);
+  }
+
+  .grad-pearl {
+    background: linear-gradient(145deg, #fff 50%, rgba(184, 224, 210, 0.25) 100%);
+  }
+
+  .grad-honeydew {
+    background: linear-gradient(145deg, #fff 50%, rgba(214, 234, 223, 0.4) 100%);
+  }
+
+  .grad-petal {
+    background: linear-gradient(145deg, #fff 50%, rgba(234, 196, 213, 0.25) 100%);
+  }
+
+  /* --- STAT WIDGETS --- */
+  .widget-card {
+    border-radius: 20px;
+    padding: 25px;
+    border: none;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Apply Gradients to Widgets */
+  .widget-1 {
+    border-top: 4px solid var(--wisteria);
+    background: linear-gradient(145deg, #fff 60%, rgba(128, 155, 206, 0.1) 100%);
+  }
+
+  .widget-2 {
+    border-top: 4px solid var(--pearl);
+    background: linear-gradient(145deg, #fff 60%, rgba(184, 224, 210, 0.15) 100%);
+  }
+
+  .widget-3 {
+    border-top: 4px solid var(--petal);
+    background: linear-gradient(145deg, #fff 60%, rgba(234, 196, 213, 0.15) 100%);
+  }
+
+  .widget-4 {
+    border-top: 4px solid var(--powder);
+    background: linear-gradient(145deg, #fff 60%, rgba(149, 184, 209, 0.1) 100%);
+  }
+
+  .widget-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+
+  .bg-icon-1 {
+    background: rgba(128, 155, 206, 0.15);
+    color: var(--wisteria);
+  }
+
+  .bg-icon-2 {
+    background: rgba(184, 224, 210, 0.25);
+    color: #74a996;
+  }
+
+  .bg-icon-3 {
+    background: rgba(234, 196, 213, 0.25);
+    color: #c98ba6;
+  }
+
+  .bg-icon-4 {
+    background: rgba(149, 184, 209, 0.2);
+    color: #6b8ca3;
+  }
+
+  .widget-num {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .widget-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* --- CARD ELEMENTS --- */
+  .card-header-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .card-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .personality-badge {
+    background: linear-gradient(135deg, var(--wisteria), var(--powder));
+    color: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: inline-block;
+    box-shadow: 0 5px 15px rgba(128, 155, 206, 0.3);
+  }
+
+  .list-item-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+  }
+
+  .list-item-custom:last-child {
+    border-bottom: none;
+  }
+
+  .match-badge {
+    background: rgba(184, 224, 210, 0.3);
+    color: #5c8a7a;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+
+  .progress {
+    height: 8px;
+    border-radius: 10px;
+    background-color: #edf2f7;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .progress-bar {
+    border-radius: 10px;
+  }
+
+  .bg-wisteria {
+    background-color: var(--wisteria);
+  }
+
+  .bg-powder {
+    background-color: var(--powder);
+  }
+
+  .btn-card-action {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: none;
+    transition: all 0.2s;
+    text-align: center;
+    display: block;
+    margin-top: 20px;
+  }
+
+  .btn-primary-soft {
+    background: rgba(128, 155, 206, 0.1);
+    color: var(--wisteria);
+  }
+
+  .btn-primary-soft:hover {
+    background: var(--wisteria);
+    color: white;
+  }
+
+  .btn-accent-soft {
+    background: rgba(234, 196, 213, 0.2);
+    color: #b56f90;
+  }
+
+  .btn-accent-soft:hover {
+    background: var(--petal);
+    color: white;
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  .action-btn {
+    padding: 15px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.5);
+    /* Semi transparent inside gradient card */
+    text-align: center;
+    transition: all 0.2s;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .action-btn i {
+    font-size: 1.5rem;
+    color: var(--wisteria);
+  }
+
+  .action-btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    color: var(--dark);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+</style>
+
+<div class="dashboard-header">
+  <div class="header-blob hb-1"></div>
+  <div class="header-blob hb-2"></div>
+  <div class="container position-relative z-2">
+    <div class="row align-items-center">
+      <div class="col-lg-8" data-aos="fade-right">
+        <div class="welcome-text">
+          <h2 class="display-5 mb-2">Welcome back, {{ user.username }}! 👋</h2>
+          <p class="mb-0 text-white-50">Here's your career development overview for today.</p>
         </div>
-        <p class="text-muted small">
-          Based on your latest assessment completed on
-          {{ latest_result.completed_at|date:"M d, Y" }}
-        </p>
-        {% endwith %}
-        {% else %}
-        <p class="text-muted">Complete your first assessment to see your personality profile</p>
-        <a href="{% url 'assessment_list' %}" class="btn btn-primary btn-sm">
-          Take Assessment
+      </div>
+      <div class="col-lg-4 text-lg-end mt-4 mt-lg-0" data-aos="fade-left">
+        <a href="{% url 'assessment_list' %}" class="btn btn-light rounded-pill px-4 py-2 fw-bold shadow-sm"
+          style="color: var(--wisteria);">
+          <i class="bi bi-plus-lg me-2"></i>New Assessment
         </a>
-        {% endif %}
-      </div>
-    </div>
-
-    <!-- Recommended Careers -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">🎯 Recommended Careers</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            Data Scientist
-            <span class="badge bg-primary">95% Match</span>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            UX Designer
-            <span class="badge bg-primary">88% Match</span>
-          </div>
-          <div class="list-group-item d-flex justify-content-between align-items-center">
-            Product Manager
-            <span class="badge bg-primary">82% Match</span>
-          </div>
-        </div>
-        <a href="#" class="btn btn-accent btn-sm mt-3 w-100">View All Recommendations</a>
-      </div>
-    </div>
-
-    <!-- Learning Progress -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">📚 Learning Paths</h5>
-      </div>
-      <div class="card-body">
-        <div class="mb-3">
-          <h6>Data Science Fundamentals</h6>
-          <div class="progress mb-2">
-            <div class="progress-bar" style="width: 65%"></div>
-          </div>
-          <small class="text-muted">65% Complete</small>
-        </div>
-        <div class="mb-3">
-          <h6>Machine Learning</h6>
-          <div class="progress mb-2">
-            <div class="progress-bar" style="width: 30%"></div>
-          </div>
-          <small class="text-muted">30% Complete</small>
-        </div>
-        <a href="#" class="btn btn-primary btn-sm w-100">Continue Learning</a>
-      </div>
-    </div>
-
-    <!-- Upcoming Tasks -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">📅 Upcoming Tasks</h5>
-      </div>
-      <div class="card-body">
-        <div class="list-group list-group-flush">
-          <div class="list-group-item">
-            <small class="text-muted">Today</small>
-            <p class="mb-1">Complete Skills Assessment</p>
-          </div>
-          <div class="list-group-item">
-            <small class="text-muted">Tomorrow</small>
-            <p class="mb-1">Review Career Matches</p>
-          </div>
-          <div class="list-group-item">
-            <small class="text-muted">This Week</small>
-            <p class="mb-1">Start Python Course</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Job Market Insights -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">💼 Job Market Insights</h5>
-      </div>
-      <div class="card-body">
-        <div class="alert alert-info">
-          <strong>Hot Job Alert:</strong> Data Scientist roles have grown by 25% in your area
-        </div>
-        <p class="small text-muted">
-          Average salary: $120,000<br>
-          Top companies hiring: Google, Amazon, Microsoft
-        </p>
-        <a href="#" class="btn btn-accent btn-sm w-100">Explore Jobs</a>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="card">
-      <div class="card-header">
-        <h5 class="mb-0">⚡ Quick Actions</h5>
-      </div>
-      <div class="card-body">
-        <div class="d-grid gap-2">
-          <a href="{% url 'assessment_list' %}" class="btn btn-outline-primary">
-            Take New Assessment
-          </a>
-          <a href="#" class="btn btn-outline-primary">
-            Update Profile
-          </a>
-          <a href="#" class="btn btn-outline-primary">
-            Browse Courses
-          </a>
-          <a href="#" class="btn btn-outline-primary">
-            Career Counseling
-          </a>
-        </div>
       </div>
     </div>
   </div>
 </div>
+
+<div class="container" style="margin-top: -50px;">
+
+  <div class="row g-4 mb-5 position-relative z-3">
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
+      <div class="widget-card widget-1">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="widget-num">2/3</div>
+            <div class="widget-label">Assessments</div>
+          </div>
+          <div class="widget-icon bg-icon-1"><i class="bi bi-bar-chart-fill"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
+      <div class="widget-card widget-2">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="widget-num">15</div>
+            <div class="widget-label">Career Matches</div>
+          </div>
+          <div class="widget-icon bg-icon-2"><i class="bi bi-bullseye"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
+      <div class="widget-card widget-3">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="widget-num">3</div>
+            <div class="widget-label">Learning Paths</div>
+          </div>
+          <div class="widget-icon bg-icon-3"><i class="bi bi-journal-bookmark-fill"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
+      <div class="widget-card widget-4">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="widget-num">5</div>
+            <div class="widget-label">Applications</div>
+          </div>
+          <div class="widget-icon bg-icon-4"><i class="bi bi-briefcase-fill"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4 pb-5">
+
+    <div class="col-lg-8">
+      <div class="row g-4">
+
+        <div class="col-md-6" data-aos="fade-up">
+          <div class="glass-card grad-wisteria">
+            <div class="card-header-custom">
+              <h5 class="card-title"><i class="bi bi-person-badge text-primary"></i> Personality</h5>
+              <a href="#" class="text-muted small"><i class="bi bi-three-dots"></i></a>
+            </div>
+            <div class="text-center py-3">
+              {% if user.assessmentresult_set.exists %}
+              {% with latest_result=user.assessmentresult_set.first %}
+              <div class="mb-3">
+                <span class="personality-badge display-6">{{ latest_result.personality_type }}</span>
+              </div>
+              <p class="text-muted small mb-0">
+                Completed on {{ latest_result.completed_at|date:"M d, Y" }}
+              </p>
+              {% endwith %}
+              {% else %}
+              <p class="text-muted mb-3">Unlock your profile insights now.</p>
+              <a href="{% url 'assessment_list' %}" class="btn btn-sm btn-primary rounded-pill">Start Now</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card grad-honeydew">
+            <div class="card-header-custom">
+              <h5 class="card-title"><i class="bi bi-graph-up-arrow text-success"></i> Market Trends</h5>
+            </div>
+            <div class="alert bg-white border shadow-sm py-2 px-3 mb-3">
+              <small><strong>🔥 Hot Alert:</strong> Data Scientist roles +25%</small>
+            </div>
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>Avg Salary</span>
+              <span class="fw-bold text-dark">$120,000</span>
+            </div>
+            <div class="d-flex justify-content-between small text-muted">
+              <span>Top Employer</span>
+              <span class="fw-bold text-dark">Google</span>
+            </div>
+            <a href="#" class="btn-card-action btn-primary-soft mt-3">Explore Jobs</a>
+          </div>
+        </div>
+
+        <div class="col-12" data-aos="fade-up" data-aos-delay="200">
+          <div class="glass-card grad-pearl">
+            <div class="card-header-custom">
+              <h5 class="card-title"><i class="bi bi-stars" style="color: var(--wisteria);"></i> Top Career Matches</h5>
+              <span class="badge bg-white text-dark border shadow-sm">Based on AI Analysis</span>
+            </div>
+
+            <div class="list-group list-group-flush bg-transparent">
+              <div class="list-item-custom">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-white rounded p-2 text-muted shadow-sm"><i class="bi bi-database"></i></div>
+                  <div>
+                    <div class="fw-bold">Data Scientist</div>
+                    <small class="text-muted">Tech • High Demand</small>
+                  </div>
+                </div>
+                <span class="match-badge">95% Match</span>
+              </div>
+
+              <div class="list-item-custom">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-white rounded p-2 text-muted shadow-sm"><i class="bi bi-palette"></i></div>
+                  <div>
+                    <div class="fw-bold">UX Designer</div>
+                    <small class="text-muted">Creative • Remote</small>
+                  </div>
+                </div>
+                <span class="match-badge">88% Match</span>
+              </div>
+
+              <div class="list-item-custom">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="bg-white rounded p-2 text-muted shadow-sm"><i class="bi bi-kanban"></i></div>
+                  <div>
+                    <div class="fw-bold">Product Manager</div>
+                    <small class="text-muted">Management • Leadership</small>
+                  </div>
+                </div>
+                <span class="match-badge">82% Match</span>
+              </div>
+            </div>
+            <a href="#" class="btn-card-action btn-primary-soft">View All Recommendations</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="row g-4">
+
+        <div class="col-12" data-aos="fade-left">
+          <div class="glass-card grad-powder">
+            <div class="card-header-custom">
+              <h5 class="card-title">⚡ Quick Actions</h5>
+            </div>
+            <div class="action-grid">
+              <a href="{% url 'assessment_list' %}" class="action-btn">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Assessment</span>
+              </a>
+              <a href="#" class="action-btn">
+                <i class="bi bi-person-gear"></i>
+                <span>Profile</span>
+              </a>
+              <a href="#" class="action-btn">
+                <i class="bi bi-collection-play"></i>
+                <span>Courses</span>
+              </a>
+              <a href="#" class="action-btn">
+                <i class="bi bi-headset"></i>
+                <span>Counselor</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12" data-aos="fade-left" data-aos-delay="100">
+          <div class="glass-card grad-petal">
+            <div class="card-header-custom">
+              <h5 class="card-title"><i class="bi bi-mortarboard-fill text-warning"></i> Learning</h5>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-end mb-1">
+                <span class="fw-bold small">Data Science 101</span>
+                <span class="small text-primary fw-bold">65%</span>
+              </div>
+              <div class="progress bg-white">
+                <div class="progress-bar bg-wisteria" style="width: 65%"></div>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <div class="d-flex justify-content-between align-items-end mb-1">
+                <span class="fw-bold small">Machine Learning</span>
+                <span class="small text-info fw-bold">30%</span>
+              </div>
+              <div class="progress bg-white">
+                <div class="progress-bar bg-powder" style="width: 30%"></div>
+              </div>
+            </div>
+
+            <a href="#" class="btn-card-action btn-accent-soft">Continue Learning</a>
+          </div>
+        </div>
+
+        <div class="col-12" data-aos="fade-left" data-aos-delay="200">
+          <div class="glass-card">
+            <div class="card-header-custom">
+              <h5 class="card-title"><i class="bi bi-calendar-check text-danger"></i> Tasks</h5>
+            </div>
+            <div class="d-flex gap-3 mb-3 border-bottom pb-2">
+              <div class="text-center" style="min-width: 40px;">
+                <div class="small fw-bold text-danger">NOV</div>
+                <div class="h5 fw-bold mb-0">23</div>
+              </div>
+              <div>
+                <div class="fw-bold small">Skills Assessment</div>
+                <div class="text-muted small">Due Today • High Priority</div>
+              </div>
+            </div>
+            <div class="d-flex gap-3">
+              <div class="text-center" style="min-width: 40px;">
+                <div class="small fw-bold text-muted">NOV</div>
+                <div class="h5 fw-bold mb-0">24</div>
+              </div>
+              <div>
+                <div class="fw-bold small">Review Matches</div>
+                <div class="text-muted small">Tomorrow</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800,
+    once: true,
+    offset: 50
+  });
+</script>
 {% endblock %}

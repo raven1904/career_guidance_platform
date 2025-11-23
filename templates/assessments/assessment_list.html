@@ -1,73 +1,233 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Assessments - CareerGuide Pro{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row mb-4">
-        <div class="col">
-            <h2>Career Assessments</h2>
-            <p class="text-muted">Discover your strengths and find your perfect career path</p>
-        </div>
-    </div>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">🧠 Personality Assessment</h5>
-                </div>
-                <div class="card-body">
-                    <p>Discover your personality type and suitable career paths based on MBTI principles.</p>
-                    <ul class="list-unstyled">
-                        <li>✅ 20 questions</li>
-                        <li>⏱️ 15 minutes</li>
-                        <li>🎯 Career matches</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url 'take_assessment' 1 %}" class="btn btn-primary w-100">Start Assessment</a>
-                </div>
-            </div>
-        </div>
+<style>
+    /* --- PALETTE VARIABLES --- */
+    :root {
+        --wisteria: #809BCE;
+        --powder: #95B8D1;
+        --pearl: #B8E0D2;
+        --honeydew: #D6EADF;
+        --petal: #EAC4D5;
+        --dark: #2c3e50;
+        --muted: #64748b;
+        --bg-light: #f8f9fa;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
 
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0">💼 Skills Assessment</h5>
-                </div>
-                <div class="card-body">
-                    <p>Evaluate your current skills and identify areas for development.</p>
-                    <ul class="list-unstyled">
-                        <li>✅ 25 questions</li>
-                        <li>⏱️ 20 minutes</li>
-                        <li>📊 Skill analysis</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <a href="#" class="btn btn-success w-100">Coming Soon</a>
-                </div>
-            </div>
-        </div>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg-light);
+        color: var(--dark);
+    }
 
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">❤️ Interests Assessment</h5>
-                </div>
-                <div class="card-body">
-                    <p>Match your interests with potential careers and industries.</p>
-                    <ul class="list-unstyled">
-                        <li>✅ 15 questions</li>
-                        <li>⏱️ 10 minutes</li>
-                        <li>🏢 Industry matches</li>
-                    </ul>
-                </div>
-                <div class="card-footer">
-                    <a href="#" class="btn btn-info w-100">Coming Soon</a>
-                </div>
-            </div>
-        </div>
+    /* --- PAGE HEADER --- */
+    .page-header {
+        text-align: center;
+        padding: 80px 0 40px;
+        background: linear-gradient(135deg, #fff 0%, #f0f4f8 100%);
+        margin-bottom: 50px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .header-title {
+        font-weight: 800;
+        color: var(--wisteria);
+        margin-bottom: 10px;
+    }
+
+    /* --- ASSESSMENT CARDS --- */
+    .assessment-card {
+        background: white;
+        border-radius: 25px;
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        box-shadow: var(--card-shadow);
+        padding: 0;
+        height: 100%;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .assessment-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(128, 155, 206, 0.15);
+    }
+
+    /* Card Header Gradient Areas */
+    .card-img-top {
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+    }
+
+    .header-personality {
+        background: linear-gradient(135deg, var(--wisteria), var(--powder));
+    }
+
+    .header-skills {
+        background: linear-gradient(135deg, var(--pearl), #74a996);
+    }
+
+    .header-interests {
+        background: linear-gradient(135deg, var(--petal), #d48fa8);
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    .card-title {
+        font-weight: 700;
+        margin-bottom: 15px;
+        font-size: 1.25rem;
+    }
+
+    .feature-list li {
+        margin-bottom: 10px;
+        font-size: 0.95rem;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .feature-list i {
+        color: var(--wisteria);
+    }
+
+    /* Buttons */
+    .btn-start {
+        width: 100%;
+        padding: 12px;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s;
+        border: none;
+    }
+
+    .btn-wisteria {
+        background: var(--wisteria);
+        color: white;
+    }
+
+    .btn-wisteria:hover {
+        background: #6b86b8;
+        box-shadow: 0 5px 15px rgba(128, 155, 206, 0.4);
+    }
+
+    .btn-disabled {
+        background: #e9ecef;
+        color: #adb5bd;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="page-header">
+    <div class="container" data-aos="fade-up">
+        <h6 class="text-uppercase text-muted fw-bold mb-2" style="letter-spacing: 2px;">Discover Yourself</h6>
+        <h2 class="display-4 header-title">Career Assessments</h2>
+        <p class="lead text-muted mx-auto" style="max-width: 600px;">
+            Take our AI-powered tests to uncover your hidden strengths and find the career path you were meant for.
+        </p>
     </div>
 </div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="assessment-card">
+                <div class="card-img-top header-personality">
+                    <i class="bi bi-person-bounding-box"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Personality Profile</h5>
+                    <p class="text-muted mb-4">Analyze your psychological traits based on MBTI principles to find
+                        environments where you thrive.</p>
+
+                    <ul class="list-unstyled feature-list mb-4">
+                        <li><i class="bi bi-check-circle-fill"></i> 20 Insightful Questions</li>
+                        <li><i class="bi bi-clock-fill"></i> 15 Minutes Est.</li>
+                        <li><i class="bi bi-bullseye"></i> Detailed Report</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <a href="{% url 'take_assessment' 1 %}" class="btn btn-start btn-wisteria">
+                            Start Assessment <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="assessment-card">
+                <div class="card-img-top header-skills">
+                    <i class="bi bi-tools"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Skills Evaluation</h5>
+                    <p class="text-muted mb-4">Assess your current technical and soft skills to identify gaps and
+                        opportunities for growth.</p>
+
+                    <ul class="list-unstyled feature-list mb-4">
+                        <li><i class="bi bi-check-circle-fill"></i> 25 Technical Questions</li>
+                        <li><i class="bi bi-clock-fill"></i> 20 Minutes Est.</li>
+                        <li><i class="bi bi-graph-up-arrow"></i> Skill Gap Analysis</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <button class="btn btn-start btn-disabled" disabled>Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+            <div class="assessment-card">
+                <div class="card-img-top header-interests">
+                    <i class="bi bi-heart-pulse-fill"></i>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Passion Finder</h5>
+                    <p class="text-muted mb-4">Match your personal interests and hobbies with potential industries and
+                        career roles.</p>
+
+                    <ul class="list-unstyled feature-list mb-4">
+                        <li><i class="bi bi-check-circle-fill"></i> 15 Preferences</li>
+                        <li><i class="bi bi-clock-fill"></i> 10 Minutes Est.</li>
+                        <li><i class="bi bi-briefcase-fill"></i> Industry Matches</li>
+                    </ul>
+
+                    <div class="mt-auto">
+                        <button class="btn btn-start btn-disabled" disabled>Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50
+    });
+</script>
 {% endblock %}
